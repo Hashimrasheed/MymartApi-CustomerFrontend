@@ -1,0 +1,20 @@
+{
+  "name": "mymartApi-sellerDashboard",
+  "version": "1.0.0",
+  "description": "Mymart Customer Dashboard",
+  "main": "index.js",
+  "author": "Hashim",
+  "license": "Mymart",
+  "private": true,
+  "dependencies": {
+    "bcrypt": "^5.0.1",
+    "express": "^4.17.1",
+    "formidable": "^1.2.2",
+    "jsonwebtoken": "^8.5.1",
+    "moment": "^2.29.1",
+    "mongoose": "^5.12.5",
+    "multer": "^1.4.2",
+    "sharp": "^0.28.3",
+    "uuid": "^8.3.2"
+  }
+}
