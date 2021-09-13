@@ -332,15 +332,6 @@ let getCategoryProduct = async (categoryId) => {
             let discountPercentage = result.model ? result.model.discountPercentage : "";
             let specialPrice = result.model ? result.model.specialPrice : "";
             let haveDiscount = false
-            if (result.product_add_ons[0]) {
-                result.product_add_ons.map((data) => {
-                    data.varients.map((val) => {
-                        if (val.isDiscountable) {
-                            haveDiscount = true
-                        }
-                    })
-                })
-            }
             return {
                 product_name: result.general.name,
                 product_descripton: result.general.description,
@@ -349,7 +340,6 @@ let getCategoryProduct = async (categoryId) => {
                 haveDiscount: haveDiscount,
                 discountPercentage: discountPercentage,
                 specialPrice: specialPrice,
-                options: result.options.length > 0 ? true : false,
                 model: result.model ? result.model.model : "",
                 quantity: result.model ? result.model.quantity : "",
                 manufacturer: result.links && result.links.manufacturer ? result.links.manufacturer.name : "",

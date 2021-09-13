@@ -8,7 +8,6 @@ const userSchema = new Schema({
     username:{type:String },
     business_name:{type:String},
     business_slug:{type:String},
-    domain_name:{type:String},
     subDomain:{type:String},
     website: {type: String},
     country_code:{type:Number},
