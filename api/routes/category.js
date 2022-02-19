@@ -4,7 +4,6 @@ var CategoryController = require('../controllers/CategoryController');
 
 
 router.get('/',  CategoryController.get_all);
-router.get('/home-page',  CategoryController.getHomePageCategory);
 
 
 module.exports = router;
