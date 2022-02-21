@@ -10,7 +10,7 @@ const productRouter = require('./api/routes/product');
 const websiteRouter = require('./api/routes/website')
 const settingRouter = require('./api/routes/setting')
 const customerRouter = require('./api/routes/customer');
-// const cartRouter = require('./api/routes/cart');
+const cartRouter = require('./api/routes/cart');
 const customerAddressRouter = require('./api/routes/customer-address')
 const orderRouter = require('./api/routes/order');
 
@@ -48,10 +48,10 @@ app.use("/banners", bannersRoutes);
 app.use("/brands", brandsRouter);
 app.use('/category', categoryRouter)
 app.use('/product', productRouter)
+app.use("/customer", customerRouter);
+app.use("/cart", cartRouter);
 app.use("/website", websiteRouter);
 app.use("/setting", settingRouter);
-app.use("/customer", customerRouter);
-// app.use("/cart", cartRouter);
 app.use("/customer-address", customerAddressRouter);
 app.use("/orders", orderRouter);
 

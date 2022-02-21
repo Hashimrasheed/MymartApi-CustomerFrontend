@@ -1,7 +1,43 @@
-const Customer = require("../models/Customer");
-const bcrypt = require("bcrypt");
+const mongoose = require('mongoose');
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
+
+const Customer = require("../models/Customer");
 const { JWT_KEY } = require("../config/constant");
+const Cart = require("../models/Cart");
+
+exports.createGuest = async (req, res, next) => {
+  try {
+    let { business_slug } = req.body
+    let customer = new Customer({
+      _id: new mongoose.Types.ObjectId,
+      business_slug,
+      customer_type: "Guest",
+    })
+    let newGuest = await customer.save()
+    let customerCart = new Cart({
+      _id: new mongoose.Types.ObjectId,
+      business_slug,
+      customerId: newGuest._id,
+      customerType: "Guest",
+      cartProducts: [],
+    })
+    let cart = await customerCart.save()
+    return res.status(200).json({
+      status:200,
+      message: "Customer created successfully",
+      data: {
+        customerId: newGuest._id
+      }
+    })
+  } catch (error) {
+    return res.status(200).json({
+      status:200,
+      message: "Something went wrong",
+      error: error.message
+    })
+  }
+};
 
 exports.login = function (req, res, next) {
   Customer.find({

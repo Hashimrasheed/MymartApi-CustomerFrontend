@@ -1,11 +1,7 @@
 const Product = require("../models/Product");
 const Category = require("../models/Category");
-const User = require('../models/User')
-const Setting = require('../models/Setting')
-const customer = require("../models/Customer")
 const ProductImage = require("../models/ProductImage");
 const configuration = require("../config/constant");
-const fs = require('fs');
 
 
 let productImage = async (product_id) => {
@@ -88,7 +84,7 @@ exports.fetchSingleProduct = async (req, res, next) => {
             _id: req.params.productId,
             status: true,
         })
-            .select("general model Specification links seo status download_link productType _id")
+            .select("general model Specification links seo download_link _id")
             .populate({ path: "links.manufacturer", select: "name" })
             .populate({ path: "links.categories", select: "cat_name" })
             .exec();
@@ -384,42 +380,42 @@ let getRelatedProduct = async (productIds, locale) => {
 //     }
 // };
 
-let getCategoryProduct = async (categoryId) => {
-    let products = await Product.find({
-        "links.categories": { $in: categoryId },
-        status: true,
-    })
-        .select(
-            // "general.name general.description model.quantity model.model model.price model.isDiscountable model.discountPercentage model.specialPrice links status download_link productType _id order_no"
-            "general.name model.quantity model.price model.isDiscountable model.discountPercentage model.specialPrice links _id order_no"
-        )
-        .populate({ path: "links.manufacturer", select: "name" })
-        .populate({ path: "links.categories", select: "cat_name" })
-        .sort({ order_no: 1 })
-        .exec();
+// let getCategoryProduct = async (categoryId) => {
+//     let products = await Product.find({
+//         "links.categories": { $in: categoryId },
+//         status: true,
+//     })
+//         .select(
+//             // "general.name general.description model.quantity model.model model.price model.isDiscountable model.discountPercentage model.specialPrice links status download_link productType _id order_no"
+//             "general.name model.quantity model.price model.isDiscountable model.discountPercentage model.specialPrice links _id order_no"
+//         )
+//         .populate({ path: "links.manufacturer", select: "name" })
+//         .populate({ path: "links.categories", select: "cat_name" })
+//         .sort({ order_no: 1 })
+//         .exec();
 
-    let product = await Promise.all(
-        products.map(async (result) => {
-            return {
-                product_name: result.general.name,
-                // product_descripton: result.general.description,
-                prod_price: result.model ? result.model.price : "",
-                isDiscountable: result.model ? result.model.isDiscountable : "",
-                discountPercentage: result.model ? result.model.discountPercentage : "",
-                specialPrice: result.model ? result.model.specialPrice : "",
-                // model: result.model ? result.model.model : "",
-                quantity: result.model ? result.model.quantity : "",
-                manufacturer: result.links && result.links.manufacturer ? result.links.manufacturer.name : "",
-                categories:
-                    result.links &&
-                        result.links.categories &&
-                        result.links.categories.length
-                        ? result.links.categories
-                        : "",
-                image: await productImage(result._id),
-                _id: result._id,
-            };
-        })
-    );
-    return product;
-};
+//     let product = await Promise.all(
+//         products.map(async (result) => {
+//             return {
+//                 product_name: result.general.name,
+//                 // product_descripton: result.general.description,
+//                 prod_price: result.model ? result.model.price : "",
+//                 isDiscountable: result.model ? result.model.isDiscountable : "",
+//                 discountPercentage: result.model ? result.model.discountPercentage : "",
+//                 specialPrice: result.model ? result.model.specialPrice : "",
+//                 // model: result.model ? result.model.model : "",
+//                 quantity: result.model ? result.model.quantity : "",
+//                 manufacturer: result.links && result.links.manufacturer ? result.links.manufacturer.name : "",
+//                 categories:
+//                     result.links &&
+//                         result.links.categories &&
+//                         result.links.categories.length
+//                         ? result.links.categories
+//                         : "",
+//                 image: await productImage(result._id),
+//                 _id: result._id,
+//             };
+//         })
+//     );
+//     return product;
+// };

@@ -12,7 +12,7 @@ var selectionPrice = mongoose.Schema({
     title: { type: String },
     price: { type: Number },
     isDiscountable: { type: Boolean, default: false },
-    specialPrice: { type: String },
+    specialPrice: { type: Number },
     discountPercentage: { type: Number },
 });
 
@@ -20,7 +20,7 @@ const Model = new Schema({
     model: { type: String }, /** This field is required */
     price: { type: String },
     isDiscountable: { type: Boolean, default: false },
-    specialPrice: { type: String },
+    specialPrice: { type: Number },
     discountPercentage: { type: Number },
     selection_price_type: {type: String, enum: ['selection_price', 'normal'], default: "normal"},
     selected_price: [selectionPrice],
