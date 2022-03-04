@@ -33,7 +33,7 @@ exports.fetchAllProducts = async (req, res, next) => {
             matchParameter.prod_category = { $in: category }
         }
         const dbProducts = await Product.find(matchParameter)
-            .select('general.name model.quantity model.price model.isDiscountable model.discountPercentage model.specialPrice links _id order_no')
+            .select('general.name general.description model.quantity model.price model.isDiscountable model.discountPercentage model.specialPrice links _id order_no')
             .populate({ path: "links.manufacturer", select: "name" })
             .populate({ path: "links.categories", select: "cat_name" })
             .sort({ order_no: 1 })
@@ -45,6 +45,7 @@ exports.fetchAllProducts = async (req, res, next) => {
             dbProducts.map(async (result) => {
                 return {
                     product_name: result.general.name,
+                    description: result.general.description,
                     prod_price: result.model ? result.model.price : "",
                     isDiscountable: result.model ? result.model.isDiscountable : "",
                     discountPercentage: result.model ? result.model.discountPercentage : "",
