@@ -14,7 +14,8 @@ exports.fetchCart = async (req, res, next) => {
       .findOne({ customerId: userId, customerType: customerType })
       .exec();
     if (cartData && cartData.cartProducts && cartData.cartProducts[0]) {
-      let cartDetails = await cartData.cartProducts.reduce(async (accumulator, cartproduct) => {
+      let cartDetails = await cartData.cartProducts.reduce(async (acc, cartproduct) => {
+        const accumulator = await acc;
         let product = await Product.findOne({ _id: cartproduct.product_id })
           .exec();
         let productTotal = 0;
