@@ -1,4 +1,5 @@
 const Cart = require("../models/Cart");
+const Product = require("../models/Product")
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { JWT_KEY } = require("../config/constant");
@@ -7,88 +8,51 @@ const _ = require("lodash")
 
 exports.fetchCart = async (req, res, next) => {
   try {
-    let customerType = req.body.customerType;
-    let userId = req.body.userId;
-    let cartData,
-      totalItem = 0,
-      totalAmount = 0;
-    if (customerType == "Registered") {
-      cartData = await Cart
-        .findOne({ customerId: userId, customerType: customerType })
-        .exec();
-    } else {
-      cartData = await Cart
-        .findOne({ guestId: userId, customerType: customerType })
-        .exec();
-    }
+    let { customerType, userId } = req.body
+    let cartData;
+    cartData = await Cart
+      .findOne({ customerId: userId, customerType: customerType })
+      .exec();
     if (cartData && cartData.cartProducts && cartData.cartProducts[0]) {
-      await Promise.all(
-        cartData.cartProducts.map(async (cartproduct, i) => {
-          let product = await Product.findOne({ _id: cartproduct.product_id })
-            .exec();
+      let cartDetails = await cartData.cartProducts.reduce(async (accumulator, cartproduct) => {
+        let product = await Product.findOne({ _id: cartproduct.product_id })
+          .exec();
+        let productTotal = 0;
 
-          let productTotal = 0;
-          productTotal = product.prod_price;
+        if (
+          product.model.selection_price_type == "selection_price" &&
+          cartproduct.selection_price_id &&
+          product.model.selected_price &&
+          product.model.selected_price[0]
+        ) {
 
-          if (product.is_discountable) {
-            productTotal = product.special_price;
+          product.model.selected_price.forEach((selection) => {
+            if (String(selection._id) == String(cartproduct.selection_price_id)) {
+              productTotal = productTotal + selection.price;
+            }
+          });
+        } else {
+          productTotal = product.model.price;
+          if (product.model.isDiscountable) {
+            productTotal = product.model.specialPrice;
           }
-          if (
-            cartproduct.product_add_ons &&
-            cartproduct.product_add_ons[0] &&
-            product.product_add_ons &&
-            product.product_add_ons[0]
-          ) {
-            cartproduct.product_add_ons.map((addOn) => {
-              if (addOn.options && addOn.options[0]) {
-                addOn.options.map((option) => {
-                  product.product_add_ons.map((addOnDb) => {
-                    if (addOnDb.options && addOnDb.options[0]) {
-                      addOnDb.options.map((optionDb) => {
-                        if (
-                          option.option_id == optionDb._id &&
-                          addOn.addon_id == addOnDb._id
-                        ) {
-                          productTotal = productTotal + optionDb.price;
-                        }
-                      });
-                    }
-                  });
-                });
-              }
-            });
-          }
-          if (
-            product.selection_price_type == "selection_price" &&
-            cartproduct.selection_price_id &&
-            product.selected_price[0] &&
-            product.selected_price
-          ) {
-            product.selected_price.map((selection) => {
-              if (selection._id == cartproduct.selection_price_id) {
-                productTotal = productTotal + selection.price;
-              }
-            });
-          }
-          totalItem = totalItem + cartproduct.quantity;
-          totalAmount = totalAmount + productTotal * cartproduct.quantity;
-          // return
-        })
-      );
-
+        }
+        return {
+          totalItem: accumulator.totalItem + cartproduct.quantity,
+          totalAmount: accumulator.totalAmount + productTotal * cartproduct.quantity
+        }
+      }, { totalItem: 0, totalAmount: 0 })
+console.log(cartDetails)
       return res.status(200).json({
-        data: {
-          totalAmount,
-          totalItem,
-        },
+        data: cartDetails,
         status: 200,
         message: "Cart fetched successfully",
       });
     } else {
       return res.status(200).json({
         data: {
-          totalAmount,
-          totalItem,
+          totalAmount: 0,
+          totalItem: 0,
         },
         status: 200,
         message: "Cart fetched successfully",
@@ -232,7 +196,7 @@ exports.removeProduct = async (req, res) => {
       {
         customerId: userId,
       }, {
-      $pull: { "cartProducts": {_id: cartProductId }}
+      $pull: { "cartProducts": { _id: cartProductId } }
     }
     )
     return res.status(200).json({
