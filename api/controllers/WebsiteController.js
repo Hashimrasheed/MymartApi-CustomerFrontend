@@ -2,7 +2,8 @@ const User = require("../models/User");
 const constant = require("../config/constant");
 
 exports.fetch_business_slug = async (req, res, next) => {
-    let domain = req.query.website
+    try {
+        let domain = req.query.website
         .replace(/^(?:https?:\/\/)?(?:www\.)?/i, "")
         .split("/")[0];
     let orCondition = [{domain_name: domain}];
@@ -11,8 +12,10 @@ exports.fetch_business_slug = async (req, res, next) => {
             0,
             +domain.lastIndexOf(constant.primarydomain) - 1
         );
-        orCondition.push({sub_domain: subdomain});
+        orCondition.push({subDomain: subdomain});
     }
+    console.log(orCondition)
+
     User.findOne({$or: orCondition})
         .select("business_slug business_type")
         .exec()
@@ -38,4 +41,12 @@ exports.fetch_business_slug = async (req, res, next) => {
                 err: err.message,
             });
         });
+    } catch (error) {
+        return res.status(500).json({
+            status_code: 400,
+            message: "Something went wrong",
+            err: error.message,
+        });
+    }
+    
 };

@@ -4,7 +4,6 @@ const SettingsController = require('../controllers/SettingsController');
 
 
 router.get('/',   SettingsController.settings);
-router.get('/store-logo', SettingsController.getStoreLogo);
 
 
 module.exports = router;

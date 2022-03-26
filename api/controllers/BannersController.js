@@ -3,8 +3,8 @@ const User = require('../models/User');
 const { ImageUrl } = require('../config/constant');
 
 exports.get_all = async(req, res, next) => {
-    let userId = await User.findOne({ business_slug: req.query.business_slug }).select('_id').exec();
-    Banner.setDefaultLanguage(req.query.locale);
+    try {
+        let userId = await User.findOne({ business_slug: req.query.business_slug }).select('_id').exec();
     Banner.find({ business_slug: req.query.business_slug })
         .then(result => {
             let response = {
@@ -15,6 +15,8 @@ exports.get_all = async(req, res, next) => {
                     tag_line: ""
                 }]
             }
+            console.log(result.length)
+
             if (result.length) {
                 response = {
                     Banners: result.map(result => {
@@ -43,10 +45,18 @@ exports.get_all = async(req, res, next) => {
             });
         })
         .catch(err => {
-            return res.status(500).json({
+            return res.status(400).json({
                 status_code: 400,
                 message: "Something went wrong",
-                errors: err
+                errors: err.message
             })
         });
+    } catch (error) {
+        return res.status(400).json({
+            status_code: 400,
+            message: "Something went wrong",
+            errors: error.message
+        })
+    }
+    
 }

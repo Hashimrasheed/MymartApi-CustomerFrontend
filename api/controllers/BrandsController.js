@@ -1,8 +1,6 @@
 const Brand = require('../models/Brand');
 
 exports.get_all = async (req, res, next) => {
-    console.log(req.query)
-    Brand.setDefaultLanguage(req.query.locale);
     Brand.find({ business_slug: req.query.business_slug, status: true })
         .then(result => {
             console.log(result)

@@ -4,7 +4,7 @@ var CustomerController = require('../controllers/CustomerController');
 var { SignInCustomerRequest } = require("../Validation/CustomerRequest");
 
 router.post("/createGuest", CustomerController.createGuest);
-router.post("/login", SignInCustomerRequest, CustomerController.login);
+// router.post("/login", SignInCustomerRequest, CustomerController.login);
 
 
 module.exports = router;

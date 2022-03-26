@@ -43,7 +43,6 @@ exports.fetchCart = async (req, res, next) => {
           totalAmount: accumulator.totalAmount + productTotal * cartproduct.quantity
         }
       }, { totalItem: 0, totalAmount: 0 })
-console.log(cartDetails)
       return res.status(200).json({
         data: cartDetails,
         status: 200,
@@ -166,7 +165,7 @@ exports.addToCart = async (req, res) => {
 
 exports.changeQuantity = async (req, res) => {
   try {
-    let { customerType, userId, cartProductId, quantity } = req.body
+    let { userId, cartProductId, quantity } = req.body
 
     await Cart.updateOne(
       {
@@ -191,19 +190,28 @@ exports.changeQuantity = async (req, res) => {
 
 exports.removeProduct = async (req, res) => {
   try {
-    let { customerType, userId, cartProductId } = req.body
+    let { userId, cartProductId } = req.body
 
-    await Cart.updateOne(
+    let removeProduct = await Cart.updateOne(
       {
         customerId: userId,
+        "cartProducts.$._id": cartProductId,
       }, {
       $pull: { "cartProducts": { _id: cartProductId } }
     }
-    )
-    return res.status(200).json({
-      status: 200,
-      message: "Product removed successfully",
-    });
+    ).exec()
+    console.log(removeProduct)
+    if(removeProduct.removeProduct) {
+      return res.status(200).json({
+        status: 200,
+        message: removeProduct.removeProduct ? "Product removed successfully": "Product not found",
+      });
+    } else {
+      return res.status(400).json({
+        status: 400,
+        message: removeProduct.removeProduct ? "Product removed successfully": "Product not found",
+      });
+    }
   } catch (error) {
     return res.status(400).json({
       error: error.message,
